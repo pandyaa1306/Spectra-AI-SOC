@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 import pg from 'pg';
 import { INITIAL_CLIENTS, INITIAL_ANALYSTS, INITIAL_ALERTS, MASTER_INCIDENT } from '../src/data/mockSocData';
 
-dotenv.config();
+dotenv.config({ path: '.env.local', quiet: true });
+dotenv.config({ quiet: true });
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL is not set');
   process.exit(1);

@@ -2,12 +2,12 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { pool, getClients, getAlerts } from './server/db';
+import { pool, getClients, getAlerts } from './server/db.js';
 
-dotenv.config();
+dotenv.config({ path: '.env.local', quiet: true });
+dotenv.config({ quiet: true });
 
 const app = express();
 app.use(express.json());
@@ -214,20 +214,22 @@ app.post('/api/swimlane/execute', (req: Request, res: Response) => {
   });
 });
 
-// Start Express server and mount Vite
+// Start Express server and mount Vite (local only). On Vercel the app is exported and run as a function;
+// the built frontend in public/ is served by Vercel's CDN.
 async function startServer() {
   const isProd =
     process.env.NODE_ENV === 'production' || Boolean(process.env.K_SERVICE) || process.argv.includes('--prod');
   const port = Number(process.env.PORT) || 3000;
 
   if (!isProd) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(process.cwd(), 'dist');
+    const distPath = path.resolve(process.cwd(), 'public');
     const indexPath = path.resolve(distPath, 'index.html');
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
@@ -240,4 +242,6 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) startServer();
+
+export default app;

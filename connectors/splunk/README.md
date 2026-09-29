@@ -38,6 +38,35 @@ Notes:
 - **License.** Pre-indexed data isn't counted against the license's daily ingest limit, so the 60-day trial or Splunk Free both work.
 - **Windows.** Run the script from WSL or Git Bash.
 
+## 1b. Windows without Docker (Splunk Enterprise trial, installed natively)
+
+1. **Install Splunk.** Download Splunk Enterprise for Windows from splunk.com (free account, 60-day trial) and run the `.msi`. Choose "Local System" and set an admin password.
+2. **Install the BOTS v3 data.** In PowerShell as Administrator:
+   ```powershell
+   cd $HOME\Downloads
+   Invoke-WebRequest https://botsdataset.s3.amazonaws.com/botsv3/botsv3_data_set.tgz -OutFile botsv3.tgz
+   tar -xzf botsv3.tgz -C "C:\Program Files\Splunk\etc\apps"
+   & "C:\Program Files\Splunk\bin\splunk.exe" restart
+   ```
+3. **Check the data.** In http://localhost:8000, search `index=botsv3 earliest=0 | stats count by sourcetype`.
+4. **Configure Spectra.** Put these lines in `.env.local` in the project folder, using any Postgres (Neon free tier needs no install):
+   ```
+   DATABASE_URL=postgres://USER:PASS@HOST/DB?sslmode=require
+   SPLUNK_URL=https://localhost:8089
+   SPLUNK_USERNAME=admin
+   SPLUNK_PASSWORD=your-splunk-password
+   SPLUNK_VERIFY_TLS=false
+   ```
+5. **Load and run.** In PowerShell, in the project folder:
+   ```powershell
+   npm run db:seed
+   npm run ingest:splunk -- --client c1 --dry-run
+   npm run ingest:splunk -- --client c1
+   npm run dev
+   ```
+
+After 60 days the trial becomes Splunk Free: 500 MB/day, no login, no users or roles, no alerting. The pre-indexed BOTS data keeps working, but reinstall the trial or get a developer license if you need logins or REST authentication.
+
 ## 2. Ingest into Spectra
 
 ```bash

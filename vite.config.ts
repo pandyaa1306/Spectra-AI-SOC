@@ -6,6 +6,9 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    // Build into public/ so the same output works locally (Express) and on Vercel (served from its CDN)
+    publicDir: false as const,
+    build: { outDir: 'public', emptyOutDir: true },
     resolve: {
       alias: {
         '@': path.resolve('.'),
