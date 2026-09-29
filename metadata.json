@@ -1,0 +1,6 @@
+{
+  "name": "FusionAI — Advanced SOC Intelligence & Operations Platform",
+  "description": "AI-Powered SOC Investigation, Attack-Chain Correlation & Multi-Client Analyst Operations Platform with explainable risk scoring, automated triage for low/medium alerts, and ServiceNow & Swimlane integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

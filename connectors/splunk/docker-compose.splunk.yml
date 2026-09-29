@@ -1,0 +1,22 @@
+# Local Splunk Enterprise for the BOTS v3 dataset.
+# The splunk/splunk image is x86-64 only. On Apple Silicon it runs under emulation (slow), so use a Linux/Windows x64 host if you can.
+# Needs about 4 GB RAM and 10 GB disk. The license starts as a 60-day trial and can then be switched to Splunk Free.
+services:
+  splunk:
+    image: splunk/splunk:latest
+    platform: linux/amd64
+    container_name: spectra-splunk
+    restart: unless-stopped
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD:?set SPLUNK_PASSWORD (8+ chars)}
+    ports:
+      - "127.0.0.1:8000:8000"   # Splunk Web
+      - "127.0.0.1:8089:8089"   # REST API used by the Spectra connector
+    volumes:
+      - splunk-etc:/opt/splunk/etc
+      - splunk-var:/opt/splunk/var
+volumes:
+  splunk-etc:
+  splunk-var:
